@@ -44,8 +44,8 @@ class ResGCNencoder(nn.Module):
     def __init__(self, nfeat, nhid):
         super(ResGCNencoder, self).__init__()
         self.gc1 = GCNConv(nfeat, nhid)
-        self.gc2 = GCNConv(nhid, nhid)
-        self.downsample = nn.Linear(nfeat, nhid)  # transform the dimension of the input
+        self.gc2 = GCNConv(nhid, nhid//2)
+        self.downsample = nn.Linear(nfeat, nhid//2)  # transform the dimension of the input
 
     def forward(self, x, edge_idx):
         identity = self.downsample(x)  # transform the input
@@ -61,9 +61,9 @@ class ResGCNdecoder(nn.Module):
 
     def __init__(self, nfeat, nhid):
         super(ResGCNdecoder, self).__init__()
-        self.gc1 = GCNConv(nhid, nhid)
+        self.gc1 = GCNConv(nhid//2, nhid)
         self.gc2 = GCNConv(nhid, nfeat)
-        self.downsample = nn.Linear(nhid, nfeat)  # transform the dimension of the input
+        self.downsample = nn.Linear(nhid//2, nfeat)  # transform the dimension of the input
 
     def forward(self, x, edge_idx):
         identity = self.downsample(x)  # transform the input
