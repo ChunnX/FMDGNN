@@ -2,42 +2,13 @@ import torch
 import numpy as np
 import os
 import random
-
+import pickle
 from scipy.io import loadmat
-from torch.utils.data import Dataset
+
+from config import *
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-class BrainDataset(Dataset):
-    def __init__(self, hospital_domain):
-        super().__init__()
-        self.source_domain = 0
-        self.num_domains = 6
-        self.hospital_domain = hospital_domain
-        self.tgt_features = []
-        for domain in range(self.num_domains):
-            if domain == 0:
-                self.src_feature = self.hospital_domain[domain]
-            else:
-                tgt_feature = self.hospital_domain[domain]
-                self.tgt_features.append(tgt_feature)
-
-    def __len__(self):
-        return self.hospital_domain[0].shape[0]  # 192
-
-    def __getitem__(self, index):
-        # 一共192个subject，每个subject595个feature
-        src = self.src_feature[index]
-        tgt1 = self.tgt_features[0][index] * 100
-        # tgt1 = self.tgt_features[0][index]
-        tgt2 = self.tgt_features[1][index]
-        tgt3 = self.tgt_features[2][index]
-        tgt4 = self.tgt_features[3][index]
-        # tgt5 = self.tgt_features[4][index]
-        tgt5 = self.tgt_features[4][index] * 10
-        return src, tgt1, tgt2, tgt3, tgt4, tgt5
 
 
 def vectorize(matrix):
@@ -58,7 +29,7 @@ def antiVectorize(vec):
     return M.clone().detach().requires_grad_(False).to(device)
 
 
-def split_data(sizes, n_instances=678):
+def split_data(sizes, n_instances=N_SUBJECTS):
     """generate a random permutation of indices from 0 to n_instances"""
     shuffled_indices = np.random.permutation(n_instances)
     groups = []
@@ -101,4 +72,14 @@ def get_source_target_domain(path, num_domains, hospital_idx):
     return source_target_domain
 
 
+def save_cross_results(filename, result):
+    with open(f"{filename}.pkl", "wb") as file:
+        pickle.dump(result, file)
+
+
+def load_cross_results(filename):
+    with open(f"{filename}.pkl", "rb") as file:
+        result = pickle.load(file)
+
+    return result
 
