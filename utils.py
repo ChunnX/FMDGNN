@@ -29,17 +29,6 @@ def antiVectorize(vec):
     return M.clone().detach().requires_grad_(False).to(device)
 
 
-def split_data(sizes, n_instances=N_SUBJECTS):
-    """generate a random permutation of indices from 0 to n_instances"""
-    shuffled_indices = np.random.permutation(n_instances)
-    groups = []
-    start = 0
-    for size in sizes:
-        groups.append(shuffled_indices[start:start+size])
-        start += size
-    return groups
-
-
 def set_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
@@ -83,3 +72,38 @@ def load_cross_results(filename):
 
     return result
 
+
+def print_fed_results(local_fold, global_fold):
+    # average MAE in each hospital
+    print("Average MAE in each hospital:")
+    print(np.mean(local_fold[0], axis=0))
+    # standard deviation in each hospital
+    print("Standard deviation of MAE in each hospital:")
+    print(np.std(local_fold[0], axis=0))
+    print()
+    # average MAE across hospitals
+    print("Average MAE across hospitals:")
+    print(np.mean(np.mean(local_fold[0], axis=0)))
+    # standard deviation across hospitals
+    print("Standard deviation of MAE across hospitals:")
+    print(np.mean(np.std(local_fold[0], axis=0), axis=0))
+    print()
+    # average topology across hospitals
+    print("Average topology across hospitals")
+    print(np.mean(np.mean(local_fold[2], axis=0), axis=0))
+    # average topology across hospitals
+    print("Standard deviation topology across hospitals")
+    print(np.mean(np.std(local_fold[2], axis=0), axis=0))
+    print()
+    print("Average MAE of global model:")
+    print(np.mean(np.mean(global_fold[0], axis=0)))
+    print("Standard deviation of MAE of global model:")
+    print(np.mean(np.std(global_fold[0], axis=0)))
+    print()
+    # average topology across hospitals
+    print("Average global topology across hospitals")
+    print(np.mean(np.mean(global_fold[2], axis=0), axis=0))
+    # average topology across hospitals
+    print("global Standard deviation topology across hospitals")
+    print(np.mean(np.std(global_fold[2], axis=0), axis=0))
+    print()
