@@ -16,3 +16,7 @@ c_idx = 0
 kl = False
 topo = False
 lamb = [0.1, 0.1]
+res = False
+aggr = "FedAvg"
+n_folds = 4
+# aggr = "FedProx"
